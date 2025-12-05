@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <title>SysEmail - Gestão de E-mails</title>
+
+    <!-- Fonte Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+
+  <body>
+    <div class="app-container">
+      <!-- SIDEBAR -->
+      <aside class="sidebar">
+        <div>
+          <div class="logo-area">
+            <div class="logo-icon">
+              <i class="ph ph-envelope-simple"></i>
+            </div>
+            <div class="logo-text">SysEmail</div>
+          </div>
+
+          <nav class="nav-menu">
+            <button class="nav-item active" data-view="dashboard">
+              <i class="ph ph-squares-four nav-icon"></i>
+              <span>Dashboard</span>
+            </button>
+            <button class="nav-item" data-view="pendencias">
+              <i class="ph ph-warning-circle nav-icon"></i>
+              <span>Pendências</span>
+            </button>
+            <button class="nav-item" data-view="cadastro">
+              <i class="ph ph-plus-circle nav-icon"></i>
+              <span>Cadastro Manual</span>
+            </button>
+            <button class="nav-item" data-view="historico">
+              <i class="ph ph-clock-counter-clockwise nav-icon"></i>
+              <span>Histórico</span>
+            </button>
+          </nav>
+        </div>
+
+        <div class="user-area">
+          <div class="user-avatar">
+            <i class="ph ph-user"></i>
+          </div>
+          <div>
+            <div class="user-name">Admin User</div>
+            <div class="user-status">Online</div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- MAIN -->
+      <main class="main-content">
+        <!-- Cabeçalho global -->
+        <header class="main-header">
+          <div>
+            <h1 class="page-title" id="page-title">Visão Geral</h1>
+            <p class="page-subtitle">
+              Resumo geral – <span id="today-date"></span>
+            </p>
+          </div>
+
+          <button class="primary-button" id="simulate-btn">
+            ⟳ Simular Captura
+          </button>
+        </header>
+
+        <!-- --------------------------- -->
+        <!-- DASHBOARD -->
+        <!-- --------------------------- -->
+        <section class="view active" id="view-dashboard">
+          <!-- Cards -->
+          <div class="cards-grid">
+            <div class="stat-card stat-total">
+              <div class="stat-header"><span>Total de E-mails</span></div>
+              <div class="stat-value" id="total-emails">0</div>
+              <p class="stat-footer">Atualizado em tempo real</p>
+            </div>
+
+            <div class="stat-card stat-success">
+              <div class="stat-header"><span>Classificados</span></div>
+              <div class="stat-value" id="classified-emails">0</div>
+              <p class="stat-footer">Processados corretamente</p>
+            </div>
+
+            <div class="stat-card stat-warning">
+              <div class="stat-header"><span>Pendentes</span></div>
+              <div class="stat-value" id="pending-emails">0</div>
+              <p class="stat-footer">Aguardando classificação</p>
+            </div>
+          </div>
+
+          <!-- E-mails por Estado -->
+          <div class="panel">
+            <div class="panel-header"><h2>E-mails por Estado</h2></div>
+            <div class="panel-body">
+              <div id="state-chart" class="bar-chart"></div>
+            </div>
+          </div>
+
+          <!-- Tendência por dia -->
+          <div class="panel">
+            <div class="panel-header">
+              <h2>Tendência - E-mails por Dia (últimos 7 dias)</h2>
+            </div>
+            <div class="panel-body">
+              <div id="daily-chart" class="bar-chart"></div>
+            </div>
+          </div>
+
+          <!-- Top 3 + Atalhos -->
+          <div class="dashboard-bottom-grid">
+            <div class="panel">
+              <div class="panel-header"><h2>Destinatários Top 3</h2></div>
+              <div class="panel-body" id="top-destinatarios"></div>
+            </div>
+
+            <div class="panel">
+              <div class="panel-header"><h2>Atalhos Rápidos</h2></div>
+              <div class="panel-body">
+                <button class="primary-button" id="goto-pendencias">
+                  Ver Pendências
+                </button>
+                <button class="secondary-button" id="goto-manual">
+                  Novo Manual
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- --------------------------- -->
+        <!-- PENDÊNCIAS -->
+        <!-- --------------------------- -->
+        <section class="view" id="view-pendencias">
+          <div class="panel">
+            <div class="panel-header">
+              <h2>Pendências de Classificação</h2>
+              <span class="badge" id="badge-pendentes">0 pendentes</span>
+            </div>
+
+            <div class="panel-body">
+              <div class="filters-row">
+                <input
+                  type="text"
+                  placeholder="Filtrar por remetente..."
+                  id="pend-filter-remetente"
+                />
+                <input type="date" id="pend-filter-data" />
+              </div>
+
+              <div id="pending-list"></div>
+            </div>
+
+            <div class="panel-footer panel-footer-actions">
+              <button class="secondary-button" id="pend-save-all">
+                Salvar tudo
+              </button>
+              <button class="primary-button" id="pend-export">Exportar</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- --------------------------- -->
+        <!-- CADASTRO MANUAL -->
+        <!-- --------------------------- -->
+        <section class="view" id="view-cadastro">
+          <div class="panel">
+            <div class="panel-header"><h2>Novo Registro Manual</h2></div>
+
+            <div class="panel-body">
+              <form class="form-grid" id="manual-form">
+                <div class="form-group">
+                  <label>Remetente</label>
+                  <input
+                    type="email"
+                    placeholder="colaborador@empresa.com"
+                    required
+                  />
+                </div>
+
+                <div class="form-group">
+                  <label>Destinatário</label>
+                  <input
+                    type="email"
+                    placeholder="cliente@dominio.com"
+                    required
+                  />
+                </div>
+
+                <div class="form-group">
+                  <label>Data / Hora</label>
+                  <input type="datetime-local" id="manual-datetime" />
+                </div>
+
+                <div class="form-group">
+                  <label>Assunto</label>
+                  <input
+                    type="text"
+                    placeholder="Ex: Proposta Comercial"
+                    required
+                  />
+                </div>
+
+                <div class="form-group full">
+                  <label>Corpo da mensagem</label>
+                  <textarea rows="4" placeholder="Digite a mensagem..."></textarea>
+                </div>
+
+                <div class="form-group">
+                  <label>UF</label>
+                  <select id="manual-uf" required>
+                    <option value="">Selecione</option>
+                    <option value="AC">AC - Acre</option>
+                    <option value="AL">AL - Alagoas</option>
+                    <option value="AP">AP - Amapá</option>
+                    <option value="AM">AM - Amazonas</option>
+                    <option value="BA">BA - Bahia</option>
+                    <option value="CE">CE - Ceará</option>
+                    <option value="DF">DF - Distrito Federal</option>
+                    <option value="ES">ES - Espírito Santo</option>
+                    <option value="GO">GO - Goiás</option>
+                    <option value="MA">MA - Maranhão</option>
+                    <option value="MT">MT - Mato Grosso</option>
+                    <option value="MS">MS - Mato Grosso do Sul</option>
+                    <option value="MG">MG - Minas Gerais</option>
+                    <option value="PA">PA - Pará</option>
+                    <option value="PB">PB - Paraíba</option>
+                    <option value="PR">PR - Paraná</option>
+                    <option value="PE">PE - Pernambuco</option>
+                    <option value="PI">PI - Piauí</option>
+                    <option value="RJ">RJ - Rio de Janeiro</option>
+                    <option value="RN">RN - Rio Grande do Norte</option>
+                    <option value="RS">RS - Rio Grande do Sul</option>
+                    <option value="RO">RO - Rondônia</option>
+                    <option value="RR">RR - Roraima</option>
+                    <option value="SC">SC - Santa Catarina</option>
+                    <option value="SP">SP - São Paulo</option>
+                    <option value="SE">SE - Sergipe</option>
+                    <option value="TO">TO - Tocantins</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label>Município</label>
+                  <input type="text" placeholder="Piripiri" required />
+                </div>
+
+                <div class="form-actions">
+                  <button type="button" class="secondary-button">
+                    Cancelar
+                  </button>
+                  <button type="submit" class="primary-button">Salvar</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </section>
+
+        <!-- --------------------------- -->
+        <!-- HISTÓRICO -->
+        <!-- --------------------------- -->
+        <section class="view" id="view-historico">
+          <div class="panel">
+            <div class="panel-header"><h2>Lista Geral</h2></div>
+
+            <div class="panel-body">
+              <div class="filters-row">
+                <input
+                  type="text"
+                  placeholder="Digite para pesquisar..."
+                  id="hist-search"
+                />
+                <input type="date" id="hist-date" />
+              </div>
+
+              <div id="history-table"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- --------------------------- -->
+        <!-- DETALHES -->
+        <!-- --------------------------- -->
+        <section class="view" id="view-detalhes">
+          <div class="panel">
+            <div class="panel-header"><h2>Detalhes</h2></div>
+
+            <div class="panel-body detalhes-body">
+              <div class="detalhes-info">
+                <p><strong>Remetente:</strong> <span id="det-remetente"></span></p>
+                <p>
+                  <strong>Destinatário:</strong>
+                  <span id="det-destinatario"></span>
+                </p>
+                <p><strong>Data:</strong> <span id="det-data"></span></p>
+                <p><strong>Assunto:</strong> <span id="det-assunto"></span></p>
+                <p>
+                  <strong>Localização:</strong>
+                  <span id="det-local"></span>
+                </p>
+
+                <div class="detalhes-local-edit">
+                  <label>Editar Local:</label>
+                  <div class="detalhes-local-grid">
+                    <select id="det-uf">
+                      <option value="">UF</option>
+                      <option value="AC">AC</option>
+                      <option value="AL">AL</option>
+                      <option value="AP">AP</option>
+                      <option value="AM">AM</option>
+                      <option value="BA">BA</option>
+                      <option value="CE">CE</option>
+                      <option value="DF">DF</option>
+                      <option value="ES">ES</option>
+                      <option value="GO">GO</option>
+                      <option value="MA">MA</option>
+                      <option value="MT">MT</option>
+                      <option value="MS">MS</option>
+                      <option value="MG">MG</option>
+                      <option value="PA">PA</option>
+                      <option value="PB">PB</option>
+                      <option value="PR">PR</option>
+                      <option value="PE">PE</option>
+                      <option value="PI">PI</option>
+                      <option value="RJ">RJ</option>
+                      <option value="RN">RN</option>
+                      <option value="RS">RS</option>
+                      <option value="RO">RO</option>
+                      <option value="RR">RR</option>
+                      <option value="SC">SC</option>
+                      <option value="SP">SP</option>
+                      <option value="SE">SE</option>
+                      <option value="TO">TO</option>
+                    </select>
+
+                    <input
+                      type="text"
+                      id="det-municipio"
+                      placeholder="Município"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div class="detalhes-mensagem">
+                <label>Mensagem:</label>
+                <div class="detalhes-mensagem-box" id="det-mensagem"></div>
+              </div>
+            </div>
+
+            <div class="panel-footer panel-footer-actions">
+              <button class="secondary-button" id="det-voltar">Voltar</button>
+              <button class="primary-button" id="det-salvar-local">
+                Salvar Local
+              </button>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- SEU TS -->
+    <script type="module" src="./index.ts"></script>
+    <!-- Ícones -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  </body>
+</html>
+
